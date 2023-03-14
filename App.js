@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from  '@react-navigation/native';
 import React from 'react';
@@ -10,11 +11,20 @@ import AccountScreen from './src/screens/AccountScreen';
 import LandingScreen from './src/screens/LandingScreen';
 import { DrawerScreen } from './src/screens/DrawerScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Provider } from './src/context/AuthContext';x
+import { Provider } from './src/context/AuthContext';
 import { setNavigator } from './src/navigationRef';
+import * as SecureStore from 'expo-secure-store';
 
+const Stack = createStackNavigator();
+
+const AuthContext = React.createContext();
+const getIsSignedIn = () => {
+  // custom logic
+  return true;
+};
 
 export default function App({ navigation }) {
+  const isSignedIn = getIsSignedIn();
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {
@@ -29,6 +39,7 @@ export default function App({ navigation }) {
             ...prevState,
             isSignout: false,
             userToken: action.token,
+            isSignedIn: true,
           };
         case 'SIGN_OUT':
           return {
@@ -42,6 +53,7 @@ export default function App({ navigation }) {
       isLoading: true,
       isSignout: false,
       userToken: null,
+      isSignedIn: false,
     }
   );
 
@@ -90,23 +102,19 @@ export default function App({ navigation }) {
   );
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-    <AuthContext.Provider value={authContext}>
+    <NavigationContainer>
       <Stack.Navigator>
-        <>
         {isSignedIn ? (
-        <>
+          <>
             <Stack.Screen name="Home" component={LandingScreen} />
-        </>
+          </>
         ) : (
-        <>
-           <Stack.Screen name="SignUp" component={SignUpScreen} />
-        </>
+          <>
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
+          </>
         )}
-        </>
       </Stack.Navigator>
-    </AuthContext.Provider>
-    </GestureHandlerRootView>
+    </NavigationContainer>
   );
 }
 
