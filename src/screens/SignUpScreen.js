@@ -3,24 +3,20 @@ import { View, Button, Text, StyleSheet, TextInput, Image, Dimensions, Touchable
 import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
-import { Context as AuthContext } from '../context/AuthContext';
-import { NavigationEvents } from 'react-navigation';
+import { Context } from '../context/AuthContext';
 
 const SignUpScreen = ({navigation}) => {
 
-    const { state, signup, clearErrorMessage } = useContext(AuthContext);
-    const  [username, setUsername] = useState('');
+    const { state, signup, clearErrorMessage } = useContext(Context);
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirm_password, setConfirmPassword] = useState('');
     const [secureTextEntry, setSecureTextEntry] = useState(true);
     const [confirm_secureTextEntry, setConfirmSecureTextEntry] = useState(true);
     const [loading, setLoading] = useState(false);
 
-  return <View style={styles.container}>
-    <NavigationEvents 
-        onWillBlur={[clearErrorMessage,()=>{setLoading(false)
-            clearErrorMessage}]}
-      />
+    return <View style={styles.container}>
+    
       <StatusBar backgroundColor='#009387' barStyle='light-content' />
       <View style={styles.header}>
         {loading ? <Text style={styles.text_header}>Loading...</Text>:

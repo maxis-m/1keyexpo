@@ -34,7 +34,7 @@ const authReducer = (state,action) => {
 
 const tryLocalSignIn = dispatch => async () => {
     //attempt to get token to see if user is logged in
-    const token = await AsyncStorage.getItem('token');
+    const token = await SecureStore.getItemAsync('token');
     if(token){
         dispatch({type: 'signin', payload: token});
         navigate('mainFlow');
@@ -120,6 +120,7 @@ const signin = (dispatch) => {
     };
 };
 
+
 const signout = dispatch => {
     return async () => {
         const token = await AsyncStorage.getItem('token');
@@ -138,6 +139,15 @@ const signout = dispatch => {
             }  
         }
         navigate('loginFlow');
+    };
+};
+const isLoggedIn = dispatch => {
+    return async () => {
+    const token = await SecureStore.getItemAsync('token');
+    if(token){
+        return true;
+    }
+    return false;
     };
 };
 
@@ -200,9 +210,10 @@ export function decodeVault(vaultString) {
   }
 
 
+
 export const { Provider, Context } = createDataContext(
     authReducer,
-    { signup, signin, signout, clearErrorMessage, tryLocalSignIn },
+    { signup, signin, signout, clearErrorMessage, tryLocalSignIn, isLoggedIn },
     { token:null, errorMessage:'', publicKey:null, privateKey:null }
 );
 
