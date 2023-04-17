@@ -4,9 +4,7 @@ import { NavigationContainer } from  '@react-navigation/native';
 import React from 'react';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from '@react-navigation/stack';
-import SplashScreen from "./src/screens/SplashScreen";
-import SignInScreen from "./src/screens/SignInScreen";
-import SignUpScreen from "./src/screens/SignUpScreen";
+import HomeScreen from "./src/screens/HomeScreen";
 import AccountScreen from './src/screens/AccountScreen';
 import LandingScreen from './src/screens/LandingScreen';
 import { DrawerScreen } from './src/screens/DrawerScreen';
@@ -107,11 +105,11 @@ export default function App({ navigation }) {
           <Stack.Navigator>
             {isSignedIn ? (
               <>
-                <Stack.Screen name="Home" component={LandingScreen} />
+                <Stack.Screen name="Landing" component={LandingScreen} />
               </>
             ) : (
               <>
-                <Stack.Screen name="SignUp" component={SignUpScreen} />
+                 <Stack.Screen name="Home" component={HomeScreen} />
               </>
             )}
           </Stack.Navigator>

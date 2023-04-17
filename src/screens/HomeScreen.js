@@ -2,19 +2,20 @@ import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, TextInput, Dimensions } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from  '@react-navigation/native';
-import AccountScreen from './AccountScreen';
-import LandingScreen from './LandingScreen';
+import { createStackNavigator } from '@react-navigation/stack';
 
-const Drawer = createDrawerNavigator();
+import SplashScreen from "./SplashScreen";
+import SignInScreen from "./SignInScreen";
+import SignUpScreen from "./SignUpScreen";
 
+const Stack = createStackNavigator();
 const HomeScreen = () => {
   return (
-    <NavigationContainer>
-      <Drawer.Navigator>
-        <Drawer.Screen name="Account" component={AccountScreen} />
-        <Drawer.Screen name="Landing" component={LandingScreen} />
-      </Drawer.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator>
+                  <Stack.Screen name="Splash" component={SplashScreen} />
+                  <Stack.Screen name="SignIn" component={SignInScreen} />
+                  <Stack.Screen name="SignUp" component={SignUpScreen} />
+    </ Stack.Navigator> 
   );
 };
 

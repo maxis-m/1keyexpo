@@ -14,13 +14,13 @@ export function makeRpCSR(accountID, sAccount, kAccount) {
     }
   ]);
 
-console.log("signing")
-csr.sign(sAccount);
-console.log("back from signing")
+  console.log("signing")
+  csr.sign(sAccount);
+  console.log("back from signing")
 
-//return csr in PEM format
-let pem = forge.pki.certificationRequestToPem(csr);
-return pem;
+  //return csr in PEM format
+  let pem = forge.pki.certificationRequestToPem(csr);
+  return pem;
 }
 export async function sendLoginToCA(usr, authCSR) {
     try {
@@ -40,7 +40,7 @@ export async function sendLoginToCA(usr, authCSR) {
       }
       return null;
     }
-  }
+}
 
   /**
  * Completes registering a 1Key account with the CA.
@@ -70,28 +70,29 @@ export async function sendRegisterToCA(usr, pwd, authCSR) {
       }
       return null;
     }
-  }
+}
 
-  export function makeCSR(privateKey, publicKey, nameValue, emailValue) {
-    let forge = require("node-forge");
-  
-    //make csr certificate using given name, email, and keys
-    let csr = forge.pki.createCertificationRequest();
-    csr.publicKey = publicKey;
-    csr.setSubject([
-      {
-        name: "commonName",
-        value: nameValue
-      }
-    ]);
-    csr.setAttributes([
-      {
-        name: "emailAddress",
-        value: emailValue
-      }
-    ]);
-    sign(privateKey);
-  }
+export function makeCSR(privateKey, publicKey, nameValue, emailValue) {
+  //make csr certificate using given name, email, and keys
+  let csr = forge.pki.createCertificationRequest();
+  csr.publicKey = publicKey;
+  csr.setSubject([
+    {
+      name: "commonName",
+      value: nameValue
+    }
+  ]);
+  csr.setAttributes([
+    {
+      name: "emailAddress",
+      value: emailValue
+    }
+  ]);
+  csr.sign(privateKey);
+  const pem = forge.pki.certificationRequestToPem(csr);
+  console.log(pem);
+  return pem;
+}
 
 
     /* The app will call the CA with a Certificate Signing Request, containing the accountID*, and K_Account*. 
@@ -100,41 +101,41 @@ export async function sendRegisterToCA(usr, pwd, authCSR) {
  */
     
 
-  export async function sendAuthCSRToCA(username, authCSR) {
-    try {
-      let response = await axios.post(
-         "https://api.letsauth.org/la3/account/sign-csr/" + username, 
-         {
-            CSR: authCSR
-         }
-      );
-      return response;
-    } catch (error) {
-      console.log('Error response: ' + error);
-      if (!error.response) {
-        alert("1Key Server is not responding. Please try again later.");
-      } else {
-        console.log(error.response.data);
-        //possible errors: 403 (unable to sign csr) or 500 (internal server error)
-      }
-      return null;
+export async function sendAuthCSRToCA(username, authCSR) {
+  try {
+    let response = await axios.post(
+       "https://api.letsauth.org/la3/account/sign-csr/" + username, 
+       {
+          CSR: authCSR
+       }
+    );
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.log('Error response: ' + error);
+    if (!error.response) {
+      alert("1Key Server is not responding. Please try again later.");
+    } else {
+      console.log(error.response.data);
+      //possible errors: 403 (unable to sign csr) or 500 (internal server error)
     }
+    return null;
   }
-  export async function sendAccountCSRToCA(csr, signature, cert) {
-    try {
-      let response = await axios.post(
-         "https://api.letsauth.org/la3/account/sign-csr/" + csr, signature, cert
-      );
-      return response;
-    } catch (error) {
-      console.log('Error response: ' + error);
-      if (!error.response) {
-        alert("1Key Server is not responding. Please try again later.");
-      } else {
-        console.log(error.response.data);
-        //possible errors: 403 (unable to sign csr) or 500 (internal server error)
-      }
-      return null;
+}
+export async function sendAccountCSRToCA(csr, signature, cert) {
+  try {
+    let response = await axios.post(
+       "https://api.letsauth.org/la3/account/sign-csr/" + csr, signature, cert
+    );
+    return response;
+  } catch (error) {
+    console.log('Error response: ' + error);
+    if (!error.response) {
+      alert("1Key Server is not responding. Please try again later.");
+    } else {
+      console.log(error.response.data);
+      //possible errors: 403 (unable to sign csr) or 500 (internal server error)
     }
+    return null;
   }
-  
+}

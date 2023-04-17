@@ -3,10 +3,12 @@ import { View, Button, Text, StyleSheet, Dimensions, Image, TouchableOpacity } f
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Context as AuthContext } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 
 
 
-const SplashScreen = ({ navigation }) => {
+const SplashScreen = () => {
+    const navigation = useNavigation();
     const { state, tryLocalSignIn } = useContext(AuthContext);
     useEffect(() => {
         tryLocalSignIn();

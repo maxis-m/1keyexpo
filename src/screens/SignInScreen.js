@@ -5,19 +5,18 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { Context as AuthContext } from '../context/AuthContext';
 import { NavigationEvents } from 'react-navigation';
+import { useNavigation } from '@react-navigation/native';
 
-const SignInScreen = ({navigation}) => {
+
+const SignInScreen = () => {
 
     const { state, signin, clearErrorMessage } = useContext(AuthContext);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const navigation = useNavigation();
 
   return <View style={styles.container}>
-      <NavigationEvents 
-        onWillBlur={()=>{setLoading(false)
-            clearErrorMessage}}
-      />
       <StatusBar backgroundColor='#009387' barStyle='light-content' />
       <View style={styles.header}>
         {loading ? <Text style={styles.text_header}>Loading...</Text>:

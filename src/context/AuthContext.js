@@ -3,8 +3,9 @@ import loginApi from "../api/login";
 import * as WebBrowser from 'expo-web-browser';
 import { Buffer } from 'buffer'
 import axios from 'axios';
-import makeCSR from '../server/ServerFacade';
-import { sendAuthCSRToCA } from "../server/ServerFacade";
+import { sendAuthCSRToCA, makeCSR } from "../server/ServerFacade";
+import * as SecureStore from 'expo-secure-store';
+import { useNavigation } from '@react-navigation/native';
 var forge = require('node-forge');
 var pki=forge.pki;
 
@@ -37,9 +38,11 @@ const tryLocalSignIn = dispatch => async () => {
     const token = await SecureStore.getItemAsync('token');
     if(token){
         dispatch({type: 'signin', payload: token});
-        navigate('mainFlow');
+        try{navigate('mainFlow');}
+        catch(err){console.log("navigation error, try local sign in with token")}
     } else{
-        navigate('loginFlow');
+        try{navigate('loginFlow');}
+        catch(err){console.log("navigation error, try local sign in without token")}
     }
 };
 
@@ -51,7 +54,6 @@ const clearErrorMessage = dispatch => () => {
 const signup = (dispatch) => {
     return async ( { username, password } ) => {
         try{
-            //await AsyncStorage.setItem('token', response.data.token);
             console.log('reaches generatekeys');
             try{
                let keys = pki.rsa.generateKeyPair(2048);
@@ -65,6 +67,11 @@ const signup = (dispatch) => {
                 let responseCert = await sendAuthCSRToCA(username, csr);
                 if(responseCert == null){
                     console.log('AuthCertificate Generation Failed');
+                    
+                    try{useNavigation().goBack();}
+                    catch(err){console.log("failed navigating back to splash screen" + err);}
+                    throw new Error('Failed at generation');
+                    return;
                 }
                 const authCertificate = forge.pki.certificateFromPem(responseCert.data.certificate);
                 let vault = {
@@ -73,19 +80,18 @@ const signup = (dispatch) => {
                     authCertificate: authCertificate
                 }
                 let vaultString = encodeVault(vault);
-                try{
-                    await AsyncStorage.setItem(username, vaultString);
-                }
-                catch(err){
-                    console.log(err.response.data);
-                }
+                let promise = await SecureStore.setItemAsync(username, vaultString);
+                promise.catch((err) => {
+                    console.error("error saving item");
+                  });
                 
             }
             catch(err){
                 dispatch({ type: 'add_error', payload: 'Problem generating keys'});
                 console.log(err);
             }
-            navigate('mainFlow');
+            try{navigate('mainFlow');}
+            catch(err){console.log("navigation error, signup")}
         }
         catch (err) {
             dispatch({ type: 'add_error', payload: 'Something went wrong when signing up'});
@@ -100,7 +106,7 @@ const signin = (dispatch) => {
         try {
             try{
                 //TODO add some actual encrption and password checking in here and then decrypt the vault and save the string in the storage
-                const vaultString = await AsyncStorage.getItem(username);
+                const vaultString = await SecureStore.getItemAsync(username);
                 const vault = decodeVault(vaultString);
                 const kAuth = vault.authKeyPublic
                 //TODO call CA signin endpoint when ready
@@ -111,7 +117,8 @@ const signin = (dispatch) => {
                console.log(err);
             }
             //move to main flow(account page, landing page, etc)
-            navigate('mainFlow');
+            try{navigate('mainFlow');}
+            catch(err){console.log("navigation error, signin")}
         }
         catch (err) {
             dispatch({ type: 'add_error', payload: 'Incorrect username or password'});
@@ -123,14 +130,13 @@ const signin = (dispatch) => {
 
 const signout = dispatch => {
     return async () => {
-        const token = await AsyncStorage.getItem('token');
+        const token = await SecureStore.getItemAsync('token');
         if(token){
             try{
                 //try to remove the token to log them out
-                //await AsyncStorage.removeItem('token');
-                await AsyncStorage.removeItem('publicKey');
-                await AsyncStorage.removeItem('privateKey');
-                await AsyncStorage.removeItem('authcsr');
+                await SecureStore.deleteItemAsync('publicKey');
+                await SecureStore.deleteItemAsync('privateKey');
+                await SecureStore.deleteItemAsync('authcsr');
                 dispatch({type: 'signout', payload: token});
             }
             catch(err){
@@ -138,7 +144,9 @@ const signout = dispatch => {
                 console.log(err.response.data);
             }  
         }
-        navigate('loginFlow');
+        try{navigate('loginFlow');}
+        catch(err){console.log("navigation error, signout")}
+        
     };
 };
 const isLoggedIn = dispatch => {
