@@ -53,6 +53,7 @@ const clearErrorMessage = dispatch => () => {
 
 const signup = (dispatch) => {
     return async ( { username, password } ) => {
+        const navigator = useNavigation();
         try{
             console.log('reaches generatekeys');
             try{
@@ -68,7 +69,7 @@ const signup = (dispatch) => {
                 if(responseCert == null){
                     console.log('AuthCertificate Generation Failed');
                     
-                    try{useNavigation().goBack();}
+                    try{navigator.navigate('Splash');}
                     catch(err){console.log("failed navigating back to splash screen" + err);}
                     throw new Error('Failed at generation');
                     return;
